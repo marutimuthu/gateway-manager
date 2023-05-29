@@ -1,0 +1,59 @@
+.mainContainer{
+    display: flex;
+    flex-direction: column;
+    padding: 0 2rem;
+    max-width: 1280px;
+    margin: auto;
+    .header{
+        display: flex;
+        justify-content: space-between;
+    }
+}
+
+
+@media screen and (max-width: 1200px) {
+    .dataChartContainer{
+        flex: 1 1 auto;
+        width : 90vw;
+        height : 80vh;
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .dataChartContainer{
+        flex: 1 1 auto;
+        width : 90vw;
+        height : 60vh;
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+}
+
+@media screen and (max-width: 650px) {
+    .dataChartContainer{
+        flex: 1 1 auto;
+        width : 90vw;
+        height : 50vh;
+        margin-top: 15px;
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+}
+
+@media screen and (max-width: 550px) {
+    .mainContainer{
+        border: 2px solid red;
+    }
+    .dataChartContainer{
+        // flex: 1 1 auto;
+        width : 95vw;
+        height : 40vh;
+        margin-top: 5px;
+        margin-left: 5px;
+        margin-right: 5px;
+        border: 2px solid red !important;
+        
+    }
+}
