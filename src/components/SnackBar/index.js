@@ -31,22 +31,6 @@ export default function CustomizedSnackbars() {
         open = false;
     };
 
-    function publishAxios(params) {
-        axios({
-            method: "post",
-            url: `${server_url}/api/device/config`,
-            data: params,
-            headers: { "Content-Type": "application/json" },
-        }).then(res => {
-            console.log(res.data)
-            console.log(message, severity)
-            openSnackbar(res.data.message, "success");
-        }).catch((error) => {
-            openSnackbar("123", "error");
-            console.log(error);
-        });
-    }
-
     //   openSnackbar();
 
     return (

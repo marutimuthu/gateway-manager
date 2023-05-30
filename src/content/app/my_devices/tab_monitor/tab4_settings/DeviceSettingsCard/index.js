@@ -334,62 +334,6 @@ const DeviceSettingsCard = () => {
     setOpen(false);
   };
 
-  function publishAxios(params) {
-    openSnackbar('Please Wait', 'info');
-    axios
-      .get(
-        // `http://54.202.17.198:8080/api/device/${userInfo.id}`
-        `${server_url}/api/device/find/${mac_id[3]}`
-      )
-      .then((response) => {
-        // Seconds
-
-        var post_by;
-        if (
-          response.data[0].wifi_status == 1 ||
-          response.data[0].eth_status == 1
-        ) {
-          post_by = 'wifi';
-        } else {
-          post_by = 'lte';
-        }
-
-        // if (() - ) < (defaults.http_refresh_interval_mins*60)) {
-        if (
-          parseInt(Math.floor(Date.now() / 1000)) -
-            parseInt(moment.utc(response.data[0].updatedAt).local() / 1000) <
-            response.data[0].http_refresh_interval_mins * 60 ==
-          1
-        ) {
-          axios({
-            method: 'post',
-            url: `${server_url}/api/device/config/${post_by}`,
-            data: params,
-            headers: { 'Content-Type': 'application/json' }
-          })
-            .then((res) => {
-              // alert(`${res.data.message}`)
-              // console.log(res.data)
-              // console.log(message, severity)
-              // openSnackbar("error", JSON.stringify(res.data.message));
-              openSnackbar(res.data.message, 'success');
-
-              // openSnackbar("error", res.data.message);
-            })
-            .catch((error) => {
-              openSnackbar('Something went wrong..', 'error');
-              console.log(error);
-            });
-        } else {
-          openSnackbar('Gateway is offline!', 'warning');
-        }
-      })
-      .catch((error) => {
-        openSnackbar('Something went wrong..', 'warning');
-        console.log(error);
-      });
-  }
-
   const mac_id = location.pathname.split('/');
   // console.log(mac_id[3])
 
@@ -602,8 +546,8 @@ const DeviceSettingsCard = () => {
     const publish = {
       mac_id: mac_id[3],
       action: 'modbus',
-      cmd: 'modbus_address_map',
-      query: `${mb_address_mapRef.current.value}`
+      cmd: 'mb_address_map',
+      data: `${mb_address_mapRef.current.value}`
     };
     // console.log(publish);
     publishAxios(publish);
@@ -735,6 +679,83 @@ const DeviceSettingsCard = () => {
     reader.readAsText(file);
     console.log(event.target.files[0]);
   };
+
+
+  function publishAxios(params) {
+    openSnackbar('Please Wait', 'info');
+    console.log(device)
+    let current_time = parseInt(Math.floor(Date.now() / 1000))
+    let gateway_time = parseInt(moment.utc(device.updatedAt).local()/1000)
+    let http_refresh_interval_mins = parseInt(device.http_refresh_interval_mins) * 60
+    console.log("current_time" + current_time)
+    console.log("gateway_time" + gateway_time)
+    console.log("http_refresh_interval_mins" + http_refresh_interval_mins)
+
+    if ((current_time - gateway_time) < (http_refresh_interval_mins * 60 * 5)) {
+      axios({
+        method: 'post',
+        url: `${server_url}/api/device/config/update`,
+        data: params,
+        headers: { 'Content-Type': 'application/json' }
+      })
+        .then((res) => {
+          // alert(`${res.data.message}`)
+          // console.log(res.data)
+          // console.log(message, severity)
+          // openSnackbar("error", JSON.stringify(res.data.message));
+          openSnackbar(res.data.message, 'success');
+
+          // openSnackbar("error", res.data.message);
+        })
+        .catch((error) => {
+          openSnackbar('Something went wrong..', 'error');
+          console.log(error);
+        });
+    } else {
+      openSnackbar('Gateway is offline!', 'warning');
+    }
+    // axios
+    //   .get(
+    //     // `http://54.202.17.198:8080/api/device/${userInfo.id}`
+    //     `${server_url}/api/device/find/${mac_id[3]}`
+    //   )
+    //   .then((response) => {
+    //     // Seconds
+    //     // if (() - ) < (defaults.http_refresh_interval_mins*60)) {
+    //     // if (
+    //     //   parseInt(Math.floor(Date.now() / 1000)) -
+    //     //     parseInt(moment.utc(response.data[0].updatedAt).local() / 1000) <
+    //     //     response.data[0].http_refresh_interval_mins * 60 ==
+    //     //   1
+    //     // ) {
+    //     //   axios({
+    //     //     method: 'post',
+    //     //     url: `${server_url}/api/device/config`,
+    //     //     data: params,
+    //     //     headers: { 'Content-Type': 'application/json' }
+    //     //   })
+    //     //     .then((res) => {
+    //     //       // alert(`${res.data.message}`)
+    //     //       // console.log(res.data)
+    //     //       // console.log(message, severity)
+    //     //       // openSnackbar("error", JSON.stringify(res.data.message));
+    //     //       openSnackbar(res.data.message, 'success');
+
+    //     //       // openSnackbar("error", res.data.message);
+    //     //     })
+    //     //     .catch((error) => {
+    //     //       openSnackbar('Something went wrong..', 'error');
+    //     //       console.log(error);
+    //     //     });
+    //     // } else {
+    //     //   openSnackbar('Gateway is offline!', 'warning');
+    //     // }
+    //   })
+    //   .catch((error) => {
+    //     openSnackbar('Something went wrong..', 'warning');
+    //     console.log(error);
+    //   });
+  }
 
   return (
     <Grid>
