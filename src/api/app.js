@@ -1,9 +1,9 @@
 import axios from 'axios';
 export var data_findByMacid
-export const server_url = "http://localhost:8080"
+// export const server_url = "http://localhost:8080"
 // export const server_url = "http://192.168.23.60:8080"
-export const google_map_api_key = "AIzaSyAZo-SBGESGEwcMyOsZswr2adf5Erhz-gk"
-// export const server_url = "https://api.iotinfra.link"
+export const google_map_api_key = ""
+export const server_url = "https://api.iotinfra.link"
 
 export async function update_findByMacid(url) {
     axios
