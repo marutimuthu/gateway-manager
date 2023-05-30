@@ -1676,7 +1676,7 @@ const DeviceSettingsCard = () => {
                   <TextField
                     inputRef={mb_address_mapRef}
                     name="mb_address_map"
-                    value={defaults.mb_address_mapRef}
+                    value={defaults.mb_address_map}
                     id="outlined-required"
                     label="Modbus Address Mapping"
                     defaultValue="[{'tag': 'D4', 'value': 'D1'}, {'tag': 'D4', 'value': 'D1'}]"
