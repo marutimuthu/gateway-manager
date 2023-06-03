@@ -11,11 +11,7 @@ import {
 import { styled } from '@mui/material/styles';
 import AssignmentTurnedInTwoToneIcon from '@mui/icons-material/AssignmentTurnedInTwoTone';
 import CancelPresentationTwoToneIcon from '@mui/icons-material/CancelPresentationTwoTone';
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import axios from 'axios';
-import { server_url } from 'src/api/app.js';
-import moment from 'moment';
 
 const RootWrapper = styled(Card)(
   ({ theme }) => `
@@ -59,69 +55,8 @@ const TypographySecondary = styled(Typography)(
 `
 );
 
-const LinearProgressWrapper = styled(LinearProgress)(
-  ({ theme }) => `
-        flex-grow: 1;
-        margin-right: ${theme.spacing(1)};
-        height: 10px;
-        // background-color: ${theme.colors.error.main};
-
-        .MuiLinearProgress-barColorPrimary {
-          // background-color: ${theme.colors.alpha.white[100]};
-          border-top-right-radius: ${theme.general.borderRadius};
-          border-bottom-right-radius: ${theme.general.borderRadius};
-        }
-`
-);
-
-function Performance() {
-  const [active, setActive] = useState(0);
-  const [inactive, setInactive] = useState(0);
-  // In future we have to store userId in redux
-  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-
-  function findActive(params) {
-    // console.log(params);
-    let current_time = parseInt(Math.floor(Date.now() / 1000));
-    let active = 0
-    let inactive = 0
-
-    params.forEach((element) => {
-      // console.log(element)
-      // console.log(element.updatedAt)
-      // console.log("current_time " + current_time)
-      var gateway_time = parseInt(moment.utc(element.updatedAt).local() / 1000);
-      // console.log("gateway_time " + gateway_time)
-      let http_refresh_interval_mins = parseInt(element.http_refresh_interval_mins) * 60;
-
-      // console.log("http_refresh_interval_mins" + http_refresh_interval_mins)
-      if (current_time - gateway_time < http_refresh_interval_mins * 60 * 5) {
-        // console.log(element.updatedAt);
-        active++
-        // console.log("Active " + active);
-        setActive(active)
-      } else {
-        inactive++
-        // console.log("Inactive " + inactive);
-        setInactive(inactive)
-      }
-    });
-  }
-
-  useEffect(() => {
-    axios
-      .get(
-        // `http://54.202.17.198:8080/api/device/${userInfo.id}`
-        `${server_url}/api/device/${userInfo.id}`
-      )
-      .then(async (response) => {
-        const data = response.data;
-        findActive(data);        
-      })
-      .catch((error) => {
-        // console.log(error);
-      });
-  }, []);
+function Performance(props) {
+  const { ...headingProps } = props;
 
   const navigate = useNavigate();
 
@@ -131,14 +66,14 @@ function Performance() {
 
   return (
     <RootWrapper sx={{ p: 1 }} onClick={handleDevices}>
-      <CardHeader title="My Devices" titleTypographyProps={{ variant: 'h3' }} />
+      {/* <CardHeader title="xStatus" titleTypographyProps={{ variant: 'h3' }} /> */}
       <CardContent>
         <Box display="flex" sx={{ px: 2, pt: 2 }} alignItems="center">
           <AvatarSuccess sx={{ mr: 2 }} variant="rounded">
             <AssignmentTurnedInTwoToneIcon fontSize="large" />
           </AvatarSuccess>
           <Box>
-            <Typography variant="h1">{active}</Typography>
+            <Typography variant="h1">{headingProps.active}</Typography>
             <TypographySecondary variant="subtitle2" noWrap>
               Active Device(s)
             </TypographySecondary>
@@ -149,19 +84,19 @@ function Performance() {
             <CancelPresentationTwoToneIcon fontSize="large" />
           </AvatarError>
           <Box>
-            <Typography variant="h1">{inactive}</Typography>
+            <Typography variant="h1">{headingProps.inactive}</Typography>
             <TypographySecondary variant="subtitle2" noWrap>
               Inactive Device(s)
             </TypographySecondary>
           </Box>
         </Box>
-        <Box pt={3}>
+        {/* <Box pt={3}>
           <LinearProgressWrapper
             value={73}
             color="primary"
             variant="determinate"
           />
-        </Box>
+        </Box> */}
       </CardContent>
     </RootWrapper>
   );

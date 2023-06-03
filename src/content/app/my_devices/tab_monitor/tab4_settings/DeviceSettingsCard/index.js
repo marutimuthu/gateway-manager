@@ -395,7 +395,7 @@ const DeviceSettingsCard = () => {
   const mb_portRef = useRef();
   const mb_tcp_slaveidRef = useRef();
   const mb_queryRef = useRef();
-  const mb_address_mapRef = useRef();
+  const mb_address_mapRef = useRef([]);
 
   const schedule_restart_enableRef = useRef();
   const schedule_restart_hourRef = useRef();
@@ -533,6 +533,9 @@ const DeviceSettingsCard = () => {
   };
 
   const handleSubmitModbusQuery = (event) => {
+    console.log(mb_queryRef.current.value);
+    console.log(typeof mb_queryRef.current.value);
+
     const publish = {
       mac_id: mac_id[3],
       action: 'modbus',
@@ -547,7 +550,7 @@ const DeviceSettingsCard = () => {
       mac_id: mac_id[3],
       action: 'modbus',
       cmd: 'mb_address_map',
-      data: `${mb_address_mapRef.current.value}`
+      data: mb_address_mapRef.current.value
     };
     // console.log(publish);
     publishAxios(publish);
@@ -607,11 +610,11 @@ const DeviceSettingsCard = () => {
   };
 
   const previewQuery = () => {
-    let query = mb_queryRef.current.value
+    let query = mb_queryRef.current.value;
     // let mb_address_map = mb_address_mapRef.current.value
-    
-    setQuery(query)
-  }
+
+    setQuery(query);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -680,18 +683,18 @@ const DeviceSettingsCard = () => {
     console.log(event.target.files[0]);
   };
 
-
   function publishAxios(params) {
     openSnackbar('Please Wait', 'info');
-    console.log(device)
-    let current_time = parseInt(Math.floor(Date.now() / 1000))
-    let gateway_time = parseInt(moment.utc(device.updatedAt).local()/1000)
-    let http_refresh_interval_mins = parseInt(device.http_refresh_interval_mins) * 60
-    console.log("current_time" + current_time)
-    console.log("gateway_time" + gateway_time)
-    console.log("http_refresh_interval_mins" + http_refresh_interval_mins)
+    console.log(device);
+    let current_time = parseInt(Math.floor(Date.now() / 1000));
+    let gateway_time = parseInt(moment.utc(device.updatedAt).local() / 1000);
+    let http_refresh_interval_mins =
+      parseInt(device.http_refresh_interval_mins) * 60;
+    // console.log("current_time" + current_time)
+    // console.log("gateway_time" + gateway_time)
+    // console.log("http_refresh_interval_mins" + http_refresh_interval_mins)
 
-    if ((current_time - gateway_time) < (http_refresh_interval_mins * 60 * 5)) {
+    if (current_time - gateway_time < http_refresh_interval_mins * 60 * 5) {
       axios({
         method: 'post',
         url: `${server_url}/api/device/config/update`,
@@ -714,47 +717,6 @@ const DeviceSettingsCard = () => {
     } else {
       openSnackbar('Gateway is offline!', 'warning');
     }
-    // axios
-    //   .get(
-    //     // `http://54.202.17.198:8080/api/device/${userInfo.id}`
-    //     `${server_url}/api/device/find/${mac_id[3]}`
-    //   )
-    //   .then((response) => {
-    //     // Seconds
-    //     // if (() - ) < (defaults.http_refresh_interval_mins*60)) {
-    //     // if (
-    //     //   parseInt(Math.floor(Date.now() / 1000)) -
-    //     //     parseInt(moment.utc(response.data[0].updatedAt).local() / 1000) <
-    //     //     response.data[0].http_refresh_interval_mins * 60 ==
-    //     //   1
-    //     // ) {
-    //     //   axios({
-    //     //     method: 'post',
-    //     //     url: `${server_url}/api/device/config`,
-    //     //     data: params,
-    //     //     headers: { 'Content-Type': 'application/json' }
-    //     //   })
-    //     //     .then((res) => {
-    //     //       // alert(`${res.data.message}`)
-    //     //       // console.log(res.data)
-    //     //       // console.log(message, severity)
-    //     //       // openSnackbar("error", JSON.stringify(res.data.message));
-    //     //       openSnackbar(res.data.message, 'success');
-
-    //     //       // openSnackbar("error", res.data.message);
-    //     //     })
-    //     //     .catch((error) => {
-    //     //       openSnackbar('Something went wrong..', 'error');
-    //     //       console.log(error);
-    //     //     });
-    //     // } else {
-    //     //   openSnackbar('Gateway is offline!', 'warning');
-    //     // }
-    //   })
-    //   .catch((error) => {
-    //     openSnackbar('Something went wrong..', 'warning');
-    //     console.log(error);
-    //   });
   }
 
   return (
@@ -1608,7 +1570,10 @@ const DeviceSettingsCard = () => {
                     <Typography sx={{ p: 1 }} variant="h5" gutterBottom>
                       Modbus Response Preview (JSON)
                     </Typography>
-                    <Card sx={{ p: 2, m: 1, maxHeight: '50vh', overflow: 'auto' }} variant="outlined">
+                    <Card
+                      sx={{ p: 2, m: 1, maxHeight: '50vh', overflow: 'auto' }}
+                      variant="outlined"
+                    >
                       <JSONPretty
                         id="json-pretty"
                         data={modbus_query_to_JSON(query)}
@@ -1632,7 +1597,7 @@ const DeviceSettingsCard = () => {
                     helperText="[ [ <slaveid>, <function_code>, <address>, <no_of_registers>, <data_type>, <index> ] ]"
                     onKeyPress={(e) => {
                       // console.log(e.code);
-                      if (e.code == "Enter") {
+                      if (e.code == 'Enter') {
                         // console.log(e.target.value);
                         previewQuery();
                       }
@@ -1703,7 +1668,7 @@ const DeviceSettingsCard = () => {
                     </Button>
                   </Grid>
                 </div>
-                
+
                 {/* <Grid container justifyContent="" alignItems="">
                                     <Button
                                         sx={{ m: { xs: 1, md: 1 } }}
