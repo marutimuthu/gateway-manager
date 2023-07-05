@@ -1,5 +1,5 @@
 import { Grid, Card, Box, Badge, Typography, Avatar } from '@mui/material';
-import SimpleMap from '../SimpleMap';
+// import SimpleMap from '../SimpleMap';
 
 // import styles from "./index.scss";
 function StatisticsCard({
@@ -82,7 +82,7 @@ function StatisticsCard({
                 <Typography variant="h5">{heading1_key}</Typography>
               </Grid>
               <Grid item md={6}>
-                <Typography variant="body" noWrap>
+                <Typography variant="body"  sx={{ wordBreak: "break-word" }}>
                   {heading1_value}
                 </Typography>
               </Grid>
@@ -93,7 +93,7 @@ function StatisticsCard({
                 <Typography variant="h5">{heading2_key}</Typography>
               </Grid>
               <Grid item md={6}>
-                <Typography variant="body" noWrap>
+                <Typography variant="body"  sx={{ wordBreak: "break-word" }}>
                   {heading2_value}
                 </Typography>
               </Grid>
@@ -104,7 +104,7 @@ function StatisticsCard({
                 <Typography variant="h5">{heading3_key}</Typography>
               </Grid>
               <Grid item md={6}>
-                <Typography variant="body" noWrap>
+                <Typography variant="body"  sx={{ wordBreak: "break-word" }}>
                   {heading3_value}
                 </Typography>
               </Grid>
@@ -115,7 +115,7 @@ function StatisticsCard({
                 <Typography variant="h5">{heading4_key}</Typography>
               </Grid>
               <Grid item md={6}>
-                <Typography variant="body" noWrap>
+                <Typography variant="body"  sx={{ wordBreak: "break-word" }}>
                   {heading4_value}
                 </Typography>
               </Grid>
@@ -126,7 +126,7 @@ function StatisticsCard({
                 <Typography variant="h5">{heading5_key}</Typography>
               </Grid>
               <Grid item md={6}>
-                <Typography variant="body" noWrap>
+                <Typography variant="body"  sx={{ wordBreak: "break-word" }}>
                   {heading5_value}
                 </Typography>
               </Grid>
@@ -137,7 +137,7 @@ function StatisticsCard({
                 <Typography variant="h5">{heading6_key}</Typography>
               </Grid>
               <Grid item md={6}>
-                <Typography variant="body" noWrap>
+                <Typography variant="body"  sx={{ wordBreak: "break-word" }}>
                   {heading6_value}
                 </Typography>
               </Grid>
@@ -148,7 +148,7 @@ function StatisticsCard({
                 <Typography variant="h5">{heading7_key}</Typography>
               </Grid>
               <Grid item md={6}>
-                <Typography variant="body" noWrap>
+                <Typography variant="body"  sx={{ wordBreak: "break-word" }} sx={{ wordBreak: "break-word" }}>
                   {heading7_value}
                 </Typography>
               </Grid>
@@ -159,7 +159,7 @@ function StatisticsCard({
                 <Typography variant="h5">{heading8_key}</Typography>
               </Grid>
               <Grid item md={6}>
-                <Typography variant="body" noWrap>
+                <Typography variant="body"  sx={{ wordBreak: "break-word" }}>
                   {heading8_value}
                 </Typography>
               </Grid>
@@ -170,7 +170,7 @@ function StatisticsCard({
                 <Typography variant="h5">{heading9_key}</Typography>
               </Grid>
               <Grid item md={6}>
-                <Typography variant="body" noWrap>
+                <Typography variant="body" sx={{ wordBreak: "break-word" }}>
                   {heading9_value}
                 </Typography>
               </Grid>
@@ -181,7 +181,7 @@ function StatisticsCard({
                 <Typography variant="h5">{heading10_key}</Typography>
               </Grid>
               <Grid item md={6}>
-                <Typography variant="body" noWrap>
+                <Typography variant="body"  sx={{ wordBreak: "break-word" }}>
                   {heading10_value}
                 </Typography>
               </Grid>
@@ -192,7 +192,7 @@ function StatisticsCard({
                 <Typography variant="h5">{heading11_key}</Typography>
               </Grid>
               <Grid item md={6}>
-                <Typography variant="body" noWrap>
+                <Typography variant="body" sx={{ wordBreak: "break-word" }}>
                   {heading11_value}
                 </Typography>
               </Grid>
@@ -203,7 +203,7 @@ function StatisticsCard({
                 <Typography variant="h5">{heading12_key}</Typography>
               </Grid>
               <Grid item md={6}>
-                <Typography variant="body" noWrap>
+                <Typography variant="body"  sx={{ wordBreak: "break-word" }}>
                   {heading12_value}
                 </Typography>
               </Grid>

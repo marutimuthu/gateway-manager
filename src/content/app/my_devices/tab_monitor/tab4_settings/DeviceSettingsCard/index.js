@@ -41,93 +41,6 @@ import { server_url } from 'src/api/app.js';
 
 import JSONPretty from 'react-json-pretty';
 
-function modbus_query_to_JSON(str) {
-  var slave_id_arr = [];
-  var function_code_arr = [];
-  var final_return_json = [];
-
-  if (str) {
-    var query_array = JSON.parse(str);
-
-    for (var i = 0; i < query_array.length; i++) {
-      if (!slave_id_arr.includes(query_array[i][0])) {
-        slave_id_arr.push(query_array[i][0]);
-      }
-
-      if (!function_code_arr.includes(query_array[i][1])) {
-        function_code_arr.push(query_array[i][1]);
-      }
-    }
-
-    for (
-      var slave_index = 0;
-      slave_index < slave_id_arr.length;
-      slave_index++
-    ) {
-      for (
-        var function_index = 0;
-        function_index < function_code_arr.length;
-        function_index++
-      ) {
-        var new_slave_id_arr = [];
-        var return_json = {};
-
-        for (var i = 0; i < query_array.length; i++) {
-          var slave = query_array[i][0];
-          var fcode = query_array[i][1];
-          var starting_address = query_array[i][2];
-          var no_of_data = query_array[i][3];
-          var datatype = query_array[i][4];
-
-          if (
-            slave == slave_id_arr[slave_index] &&
-            fcode == function_code_arr[function_index]
-          ) {
-            if (!new_slave_id_arr.includes(slave)) {
-              new_slave_id_arr.push(slave);
-              return_json.slave_id = slave_id_arr[slave_index];
-              return_json.function_code = function_code_arr[function_index];
-            }
-
-            for (
-              var data_count = starting_address;
-              data_count < starting_address + no_of_data;
-              data_count
-            ) {
-              if (datatype >= 0 && datatype <= 11 && fcode != 1 && fcode != 2) {
-                return_json['D' + (data_count + 1)] = 0;
-                data_count += 2;
-              } else {
-                return_json['D' + (data_count + 1)] = 0;
-                data_count += 1;
-              }
-            }
-          }
-        }
-
-        if (JSON.stringify(return_json) !== '{}') {
-          final_return_json.push(return_json);
-        }
-      }
-    }
-    // console.log(final_return_json);
-    return final_return_json;
-  }
-}
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
-function find_label(value, array) {
-  if (value !== undefined && value !== '') {
-    var find_ = array.find((obj) => obj.value == value);
-    return find_.label;
-  } else {
-    return '-';
-  }
-}
-
 const network_mode = [
   {
     value: '0',
@@ -311,6 +224,117 @@ const schedule_restart_mode = [
   }
 ];
 
+function validate_mb_query(query){
+  try{
+    var valid_query = true;
+    var query = JSON.parse(query);
+
+    query.forEach(element => {
+      if(element.length != 6){
+        valid_query = false;
+      }
+    });
+
+    if(valid_query == true){
+      return true;
+    }
+    else{
+        return false;
+    }
+  }
+  catch{
+      console.log("invalid");
+      return false;
+  }
+}
+
+function modbus_query_to_JSON(str) {
+  var slave_id_arr = [];
+  var function_code_arr = [];
+  var final_return_json = [];
+
+  if (str) {
+    var query_array = JSON.parse(str);
+
+    for (var i = 0; i < query_array.length; i++) {
+      if (!slave_id_arr.includes(query_array[i][0])) {
+        slave_id_arr.push(query_array[i][0]);
+      }
+
+      if (!function_code_arr.includes(query_array[i][1])) {
+        function_code_arr.push(query_array[i][1]);
+      }
+    }
+
+    for (
+      var slave_index = 0;
+      slave_index < slave_id_arr.length;
+      slave_index++
+    ) {
+      for (
+        var function_index = 0;
+        function_index < function_code_arr.length;
+        function_index++
+      ) {
+        var new_slave_id_arr = [];
+        var return_json = {};
+
+        for (var i = 0; i < query_array.length; i++) {
+          var slave = query_array[i][0];
+          var fcode = query_array[i][1];
+          var starting_address = query_array[i][2];
+          var no_of_data = query_array[i][3];
+          var datatype = query_array[i][4];
+
+          if (
+            slave == slave_id_arr[slave_index] &&
+            fcode == function_code_arr[function_index]
+          ) {
+            if (!new_slave_id_arr.includes(slave)) {
+              new_slave_id_arr.push(slave);
+              return_json.slave_id = slave_id_arr[slave_index];
+              return_json.function_code = function_code_arr[function_index];
+            }
+
+            for (
+              var data_count = starting_address;
+              data_count < starting_address + no_of_data;
+              data_count
+            ) {
+              if (datatype >= 0 && datatype <= 11 && fcode != 1 && fcode != 2) {
+                return_json['D' + (data_count + 1)] = 0;
+                data_count += 2;
+              } else {
+                return_json['D' + (data_count + 1)] = 0;
+                data_count += 1;
+              }
+            }
+          }
+        }
+
+        if (JSON.stringify(return_json) !== '{}') {
+          final_return_json.push(return_json);
+        }
+      }
+    }
+    // console.log(final_return_json);
+    return final_return_json;
+  }
+}
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+function find_label(value, array) {
+  if (value !== undefined && value !== '') {
+    var find_ = array.find((obj) => obj.value == value);
+    return find_.label;
+  } else {
+    return '-';
+  }
+}
+
 const DeviceSettingsCard = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState(0);
@@ -320,26 +344,18 @@ const DeviceSettingsCard = () => {
   const vertical = 'bottom';
   const horizontal = 'right';
   const [loading, setLoading] = useState(false);
-
-  const openSnackbar = (message, severity) => {
-    setMessage(message);
-    setSeverity(severity);
-    setOpen(true);
-    // console.log(message,severity)
-  };
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpen(false);
-  };
-
-  const mac_id = location.pathname.split('/');
-  // console.log(mac_id[3])
-
   const [device, setDevice] = useState([]);
   const [defaults, setDefaults] = useState({});
   const [inputs, setInputs] = useState({});
+
+  const [networkValues, setNetworkValues] = useState({});
+  const [dataRouteValues, setDataRouteValues] = useState({});
+  const [modbusValues, setModbusValues] = useState({});
+  const [restartValues, setRestartValues] = useState({});
+  const [formErrors, setFormErrors] = useState({});
+
+  const [certHTTPSerr, setCertHTTPSerr] = useState(false);
+  const [certMQTTSerr, setCertMQTTSerr] = useState(false);
 
   const network_modeRef = useRef();
   const wifi_ssidRef = useRef();
@@ -387,6 +403,7 @@ const DeviceSettingsCard = () => {
   const mb_modeRef = useRef();
   const mb_intervalRef = useRef();
   const mb_timeoutRef = useRef();
+  const mb_offsetRef = useRef();
   const baudRef = useRef();
   const data_bitsRef = useRef();
   const parityRef = useRef();
@@ -402,6 +419,92 @@ const DeviceSettingsCard = () => {
   const schedule_restart_minuteRef = useRef();
   const schedule_restart_secondRef = useRef();
 
+  const openSnackbar = (message, severity) => {
+    setMessage(message);
+    setSeverity(severity);
+    setOpen(true);
+    // console.log(message,severity)
+  };
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
+
+  const mac_id = location.pathname.split('/');
+  // console.log(mac_id[3])
+
+  const validateValues = (valuez) => {
+    let errors = {};
+    const regex = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/i;
+
+    if(valuez.network_mode < 0 || valuez.network_mode > 3){
+      errors.network_mode = "Select Valid Network Mode";
+    }
+    if(valuez.dhcp < 0 || valuez.dhcp > 1){
+      errors.dhcp = "Select Valid DHCP Mode";
+    }
+    if((valuez.ip != undefined) && (!regex.test(valuez.ip))){
+      errors.ip = "Enter Valid IP";
+    } 
+    if((valuez.gateway != undefined) && (!regex.test(valuez.gateway))){
+      errors.gateway = "Enter Valid Gateway";
+    }
+    if((valuez.subnet != undefined) && (!regex.test(valuez.subnet))){
+      errors.subnet = "Enter Valid Subnet";
+    }
+    if((valuez.dns1 != undefined) && (!regex.test(valuez.dns1))){
+      errors.dns1 = "Enter Valid DNS1";
+    }
+    if((valuez.dns2 != undefined) && (!regex.test(valuez.dns2))){
+      errors.dns2 = "Enter Valid DNS2";
+    }
+    if(valuez.mode_routes < 0 || valuez.mode_routes > 3){
+      errors.mode_routes = "Select Valid Data Route";
+    }
+    if(valuez.in_interval < 1){
+      errors.in_interval = "Select Valid Publish Interval";
+    }
+    if(valuez.in1_mode < 0 || valuez.in1_mode > 3){
+      errors.in1_mode = "Select Valid Input Mode";
+    }
+    if(valuez.in2_mode < 0 || valuez.in2_mode > 3){
+      errors.in2_mode = "Select Valid Input Mode";
+    }
+    if(valuez.mb_mode < 0 || valuez.mb_mode > 3){
+      errors.mb_mode = "Select Valid Modbus Mode";
+    }
+    if(valuez.mb_timeout < 1000){
+      errors.mb_timeout = "Set Interval more than 1000";
+    }
+    if((valuez.data_bits != undefined) && (valuez.data_bits != 7 && valuez.data_bits != 8)){
+      errors.data_bits = "Set Valid Data Bits";
+    }
+    if((valuez.baud != undefined) && (valuez.baud != 9600 && valuez.baud != 4800 && valuez.baud != 115200)){
+      errors.baud = "Set Valid Baud Rate";
+    }
+    if(valuez.parity < 0 || valuez.parity > 1){
+      errors.parity = "Select Valid Parity";
+    }
+    if((valuez.stop_bits != undefined) && (valuez.stop_bits != '1' && valuez.stop_bits != '1_5' && valuez.stop_bits != '2')){
+      errors.stop_bits = "Select Valid Stop Bits";
+    }
+    if(valuez.schedule_restart_enable < 0 || valuez.schedule_restart_enable > 2){
+      errors.schedule_restart_enable = "Select Valid Restart Mode";
+    }
+    if(valuez.schedule_restart_hour < 0 || valuez.schedule_restart_hour > 23){
+      errors.schedule_restart_hour = "Select Valid Hour";
+    }
+    if(valuez.schedule_restart_minute < 0 || valuez.schedule_restart_minute > 60){
+      errors.schedule_restart_minute = "Select Valid Minute";
+    }
+    if(valuez.schedule_restart_second < 0 || valuez.schedule_restart_second > 60){
+      errors.schedule_restart_second = "Select Valid Seconds";
+    }
+    return errors;
+  }
+
   const handleChange = (event) => {
     event.preventDefault();
     const name = event.target.name;
@@ -416,66 +519,101 @@ const DeviceSettingsCard = () => {
   };
 
   const handleSubmitNetwork = (event) => {
-    const publish = {
-      action: 'network',
-      mac_id: mac_id[3],
-      network_mode: `${network_modeRef.current.value}`,
-      wifi_ssid: `${wifi_ssidRef.current.value}`,
-      wifi_pass: `${wifi_passRef.current.value}`,
-      dhcp: `${dhcpRef.current.value}`,
-      ip: `${ipRef.current.value}`,
-      gateway: `${gatewayRef.current.value}`,
-      subnet: `${subnetRef.current.value}`,
-      dns1: `${dns1Ref.current.value}`,
-      dns2: `${dns2Ref.current.value}`,
-      lte_apn: `${lte_apnRef.current.value}`
-    };
+    event.preventDefault();
+    let errors_obj = validateValues(networkValues);
+    console.log(errors_obj);
+    var object_length = Object.keys(errors_obj).length;
+    if(object_length > 0){
+      setFormErrors(errors_obj);
+      openSnackbar('Enter Valid Values', 'error');
+    }
+    else{
+      setFormErrors(errors_obj);
+      const publish = {
+        action: 'network',
+        mac_id: mac_id[3],
+        network_mode: `${parseInt(network_modeRef.current.value).toString()}`,
+        wifi_ssid: `${wifi_ssidRef.current.value}`,
+        wifi_pass: `${wifi_passRef.current.value}`,
+        dhcp: `${parseInt(dhcpRef.current.value).toString()}`,
+        ip: `${ipRef.current.value}`,
+        gateway: `${gatewayRef.current.value}`,
+        subnet: `${subnetRef.current.value}`,
+        dns1: `${dns1Ref.current.value}`,
+        dns2: `${dns2Ref.current.value}`,
+        lte_apn: `${lte_apnRef.current.value}`
+      };
 
-    console.log(publish);
-    publishAxios(publish);
+      console.log(publish);
+      publishAxios(publish); 
+    }
   };
 
   const handleSubmitRoutes = (event) => {
-    const publish = {
-      mac_id: mac_id[3],
-      action: 'mqtt',
-      mode_routes: `${mode_routesRef.current.value}`,
-      mqtt_clientid: `${mqtt_clientidRef.current.value}`,
-      mqtt_url: `${mqtt_urlRef.current.value}`,
-      mqtt_user: `${mqtt_userRef.current.value}`,
-      mqtt_pass: `${mqtt_passRef.current.value}`,
-
-      // mqtt_lte_clientid: `${mqtt_lte_clientidRef.current.value}`,
-      // mqtt_lte_url: `${mqtt_lte_urlRef.current.value}`,
-      // mqtt_lte_user: `${mqtt_lte_userRef.current.value}`,
-      // mqtt_lte_pass: `${mqtt_lte_passRef.current.value}`,
-      https_api: `${https_apiRef.current.value}`,
-      https_backup_api: `${https_backup_apiRef.current.value}`
-    };
-    console.log(publish);
-    publishAxios(publish);
+    let errors_obj = validateValues(dataRouteValues);
+    console.log(errors_obj);
+    var object_length = Object.keys(errors_obj).length;
+    if(object_length > 0){
+      setFormErrors(errors_obj);
+      openSnackbar('Enter Valid Values', 'error');
+    }
+    else{
+      setFormErrors(errors_obj);
+      const publish = {
+        mac_id: mac_id[3],
+        action: 'mqtt',
+        mode_routes: `${parseInt(mode_routesRef.current.value).toString()}`,
+        mqtt_clientid: `${mqtt_clientidRef.current.value}`,
+        mqtt_url: `${mqtt_urlRef.current.value}`,
+        mqtt_user: `${mqtt_userRef.current.value}`,
+        mqtt_pass: `${mqtt_passRef.current.value}`,
+  
+        // mqtt_lte_clientid: `${mqtt_lte_clientidRef.current.value}`,
+        // mqtt_lte_url: `${mqtt_lte_urlRef.current.value}`,
+        // mqtt_lte_user: `${mqtt_lte_userRef.current.value}`,
+        // mqtt_lte_pass: `${mqtt_lte_passRef.current.value}`,
+        https_api: `${https_apiRef.current.value}`,
+        https_backup_api: `${https_backup_apiRef.current.value}`
+      };
+      console.log(publish);
+      publishAxios(publish);
+    }
   };
 
   const handleSubmitMQTTCert = (event) => {
-    const publish = {
-      mac_id: mac_id[3],
-      action: 'certs',
-      key: `mqtts`,
-      content: `${uploadFileMQTTS}`
-    };
-    console.log(publish);
-    publishAxios(publish);
+    if(uploadFileMQTTS == null){
+      setCertMQTTSerr(true);
+      openSnackbar('Select a File', 'error');
+    }
+    else{
+      setCertMQTTSerr(false);
+      const publish = {
+        mac_id: mac_id[3],
+        action: 'certs',
+        key: `mqtts`,
+        content: `${uploadFileMQTTS}`
+      };
+      console.log(publish);
+      publishAxios(publish);
+    }
   };
 
   const handleSubmitHTTPSCert = (event) => {
-    const publish = {
-      mac_id: mac_id[3],
-      action: 'certs',
-      key: `https`,
-      content: `${uploadFileHTTPS}`
-    };
-    console.log(publish);
-    publishAxios(publish);
+    if(uploadFileHTTPS == null){
+      setCertHTTPSerr(true);
+      openSnackbar('Select a File', 'error');
+    }
+    else{
+      setCertHTTPSerr(false);
+      const publish = {
+        mac_id: mac_id[3],
+        action: 'certs',
+        key: `https`,
+        content: `${uploadFileHTTPS}`
+      };
+      console.log(publish);
+      publishAxios(publish);
+    }
   };
 
   // const handleChangeModbus = (event) => {
@@ -486,63 +624,113 @@ const DeviceSettingsCard = () => {
   // }
 
   const handleSubmitIN1 = (event) => {
-    const publish = {
-      mac_id: mac_id[3],
-      action: 'input',
-      input_select: `IN1`,
-      mode: `${in1_modeRef.current.value}`,
-      slope: `${in1_slopeRef.current.value}`,
-      offset: `${in1_offsetRef.current.value}`,
-      post_interval: `${in_intervalRef.current.value}`
-    };
-    console.log(publish);
-    publishAxios(publish);
+    event.preventDefault();
+    var temp_object = {
+      "in_interval" : in_intervalRef.current.value,
+      "in1_mode" : in1_modeRef.current.value
+    }
+    let errors_obj = validateValues(temp_object);
+    console.log(errors_obj);
+    var object_length = Object.keys(errors_obj).length;
+    if(object_length > 0){
+      setFormErrors(errors_obj);
+      openSnackbar('Enter Valid Values', 'error');
+    }
+    else{
+      setFormErrors(errors_obj);
+      const publish = {
+        mac_id: mac_id[3],
+        action: 'input',
+        input_select: `IN1`,
+        mode: `${parseInt(in1_modeRef.current.value).toString}`,
+        slope: `${in1_slopeRef.current.value}`,
+        offset: `${in1_offsetRef.current.value}`,
+        post_interval: `${parseInt(in_intervalRef.current.value).toString()}`
+      };
+      console.log(publish);
+      publishAxios(publish);
+    }
   };
 
   const handleSubmitIN2 = (event) => {
-    const publish = {
-      mac_id: mac_id[3],
-      action: 'input',
-      input_select: `IN2`,
-      mode: `${in2_modeRef.current.value}`,
-      slope: `${in2_slopeRef.current.value}`,
-      offset: `${in2_offsetRef.current.value}`,
-      post_interval: `${in_intervalRef.current.value}`
-    };
-    console.log(publish);
-    publishAxios(publish);
+    event.preventDefault();
+    var temp_object = {
+      "in_interval" : in_intervalRef.current.value,
+      "in2_mode" : in2_modeRef.current.value
+    }
+    let errors_obj = validateValues(temp_object);
+    console.log(errors_obj);
+    var object_length = Object.keys(errors_obj).length;
+    if(object_length > 0){
+      setFormErrors(errors_obj);
+      openSnackbar('Enter Valid Values', 'error');
+    }
+    else{
+      setFormErrors(errors_obj);
+      const publish = {
+        mac_id: mac_id[3],
+        action: 'input',
+        input_select: `IN2`,
+        mode: `${parseInt(in2_modeRef.current.value).toString()}`,
+        slope: `${in2_slopeRef.current.value}`,
+        offset: `${in2_offsetRef.current.value}`,
+        post_interval: `${parseInt(in_intervalRef.current.value).toString()}`
+      };
+      console.log(publish);
+      publishAxios(publish);
+    }
   };
 
   const handleSubmitModbusConfig = (event) => {
-    const publish = {
-      mac_id: mac_id[3],
-      action: 'modbus',
-      mb_mode: `${mb_modeRef.current.value}`,
-      mb_interval: `${mb_intervalRef.current.value}`,
-      mb_timeout: `${mb_timeoutRef.current.value}`,
-      baud: `${baudRef.current.value}`,
-      data_bits: `${data_bitsRef.current.value}`,
-      parity: `${parityRef.current.value}`,
-      stop_bits: `${stop_bitsRef.current.value}`,
-      mb_ip: `${mb_ipRef.current.value}`,
-      mb_port: `${mb_portRef.current.value}`,
-      mb_tcp_slaveid: `${mb_tcp_slaveidRef.current.value}`
-    };
-    console.log(publish);
-    publishAxios(publish);
+    event.preventDefault();
+    let errors_obj = validateValues(modbusValues);
+    var object_length = Object.keys(errors_obj).length;
+    if(object_length > 0){
+      setFormErrors(errors_obj);
+      openSnackbar('Enter Valid Values', 'error');
+    }
+    else{
+      setFormErrors(errors_obj);
+      const publish = {
+        mac_id: mac_id[3],
+        action: 'modbus',
+        mb_mode: `${parseInt(mb_modeRef.current.value).toString()}`,
+        mb_interval: `${mb_intervalRef.current.value}`,
+        mb_timeout: `${mb_timeoutRef.current.value}`,
+        mb_offset: `${parseInt(mb_offsetRef.current.value).toString()}`,
+        baud: `${parseInt(baudRef.current.value).toString()}`,
+        data_bits: `${parseInt(data_bitsRef.current.value).toString()}`,
+        parity: `${parseInt(parityRef.current.value).toString()}`,
+        stop_bits: `${stop_bitsRef.current.value}`,
+        mb_ip: `${mb_ipRef.current.value}`,
+        mb_port: `${mb_portRef.current.value}`,
+        mb_tcp_slaveid: `${mb_tcp_slaveidRef.current.value}`
+      };
+      // console.log(publish);
+      publishAxios(publish);
+    }
   };
 
   const handleSubmitModbusQuery = (event) => {
-    console.log(mb_queryRef.current.value);
-    console.log(typeof mb_queryRef.current.value);
-
-    const publish = {
-      mac_id: mac_id[3],
-      action: 'modbus',
-      query: `${mb_queryRef.current.value}`
-    };
-    // console.log(publish);
-    publishAxios(publish);
+    if(validate_mb_query(mb_queryRef.current.value))
+    {
+      setFormErrors({});
+      const publish = {
+        mac_id: mac_id[3],
+        action: 'modbus',
+        query: `${mb_queryRef.current.value}`
+      };
+      console.log(publish);
+      publishAxios(publish);
+    }
+    else
+    {
+      var temp_object = {
+        "mb_query" : "Invalid Query Format."
+      };
+      setFormErrors(temp_object);
+      openSnackbar("Enter Valid Query Format.", "error");
+    }
   };
 
   const handleSubmitModbusAdressMap = (event) => {
@@ -550,9 +738,9 @@ const DeviceSettingsCard = () => {
       mac_id: mac_id[3],
       action: 'modbus',
       cmd: 'mb_address_map',
-      data: mb_address_mapRef.current.value
+      data: JSON.parse(`${mb_address_mapRef.current.value}`)
     };
-    // console.log(publish);
+    console.log(publish);
     publishAxios(publish);
   };
 
@@ -570,7 +758,7 @@ const DeviceSettingsCard = () => {
     const publish = {
       mac_id: mac_id[3],
       action: 'modbus',
-      cmd: 'erase_modbus_address_map'
+      cmd: 'erase_mb_address_map'
     };
     // console.log(publish);
     publishAxios(publish);
@@ -587,34 +775,52 @@ const DeviceSettingsCard = () => {
   };
 
   const handleSubmitSystem = (event) => {
-    const publish = {
-      mac_id: mac_id[3],
-      action: 'schedule_restart',
-      schedule_restart_enable: `${schedule_restart_enableRef.current.value}`,
-      schedule_restart_hour: `${schedule_restart_hourRef.current.value}`,
-      schedule_restart_minute: `${schedule_restart_minuteRef.current.value}`,
-      schedule_restart_second: `${schedule_restart_secondRef.current.value}`
-    };
-    // console.log(publish);
-    publishAxios(publish);
+    event.preventDefault();
+    let errors_obj = validateValues(restartValues);
+    console.log(errors_obj);
+    var object_length = Object.keys(errors_obj).length;
+    if(object_length > 0){
+      setFormErrors(errors_obj);
+      openSnackbar('Enter Valid Values', 'error');
+    }
+    else{
+      setFormErrors(errors_obj);
+      const publish = {
+        mac_id: mac_id[3],
+        action: 'schedule_restart',
+        schedule_restart_enable: `${parseInt(schedule_restart_enableRef.current.value).toString()}`,
+        schedule_restart_hour: `${parseInt(schedule_restart_hourRef.current.value).toString()}`,
+        schedule_restart_minute: `${parseInt(schedule_restart_minuteRef.current.value).toString()}`,
+        schedule_restart_second: `${parseInt(schedule_restart_secondRef.current.value).toString()}`
+      };
+      // console.log(publish);
+      publishAxios(publish);
+    }
   };
 
-  const handleSubmitFormat = (event) => {
-    const publish = {
-      mac_id: mac_id[3],
-      action: 'modbus',
-      cmd: 'erase_queries'
-    };
-    // console.log(publish);
-    publishAxios(publish);
-  };
+  // const handleSubmitFormat = (event) => {
+  //   const publish = {
+  //     mac_id: mac_id[3],
+  //     action: 'modbus',
+  //     cmd: 'erase_queries'
+  //   };
+  //   // console.log(publish);
+  //   publishAxios(publish);
+  // };
 
   const previewQuery = () => {
-    let query = mb_queryRef.current.value;
-    // let mb_address_map = mb_address_mapRef.current.value
-
-    setQuery(query);
-  };
+    if(validate_mb_query(mb_queryRef.current.value)){
+      setFormErrors({});
+      setQuery(mb_queryRef.current.value);
+    }
+    else{
+      var temp_object = {
+        "mb_query" : "Invalid Query Format."
+      };
+      setFormErrors(temp_object);
+      openSnackbar("Enter Valid Query Format.", "error");
+    }
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -626,6 +832,7 @@ const DeviceSettingsCard = () => {
         setDevice(response.data[0]);
         setDefaults(response.data[0]);
         setData_received(true);
+        // setNetworkValues(response.data[0]);
         setTimeout(() => {
           setDefaults({});
           setLoading(false);
@@ -663,12 +870,10 @@ const DeviceSettingsCard = () => {
       setUploadFileMQTTS(singleLineCertificate);
     };
     reader.readAsText(file);
-    console.log(event.target.files[0]);
   };
 
   const handleFileSelectHTTPS = (event) => {
     setSelectedFileHTTPS(event.target.files[0]);
-
     var file = event.target.files[0];
     var reader = new FileReader();
     reader.onload = function (event) {
@@ -682,6 +887,46 @@ const DeviceSettingsCard = () => {
     reader.readAsText(file);
     console.log(event.target.files[0]);
   };
+
+  const handleNetworkChange = (e) => {
+    e.preventDefault();
+    setNetworkValues({ ...networkValues, [e.target.name] : (e.target.value)});
+  }
+
+  const handleRestartChange = (e) => {
+    e.preventDefault();
+    setRestartValues({ ...restartValues, [e.target.name] : (e.target.value)});
+  }
+
+  const handleDataRouteChange = (e) => {
+    e.preventDefault();
+    setDataRouteValues({ ...dataRouteValues, [e.target.name] : (e.target.value)});
+  }
+
+  const handleModbusChange = (e) => {
+    e.preventDefault();
+    setModbusValues({ ...modbusValues, [e.target.name] : (e.target.value)});
+  }
+
+  useEffect(() => {
+    console.log(networkValues);
+  }, [networkValues]);
+
+  useEffect(() => {
+    console.log(dataRouteValues);
+  }, [dataRouteValues]);
+
+  useEffect(() => {
+    console.log(modbusValues);
+  }, [modbusValues]);
+
+  useEffect(() => {
+    console.log(restartValues);
+  }, [restartValues]);
+
+  useEffect(() => {
+    console.log(formErrors);
+  }, [formErrors]);
 
   function publishAxios(params) {
     openSnackbar('Please Wait', 'info');
@@ -755,7 +1000,7 @@ const DeviceSettingsCard = () => {
           >
             <Accordion expanded={true}>
               <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
+                // expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1a-content"
                 id="panel1a-header"
                 color="primary"
@@ -778,7 +1023,7 @@ const DeviceSettingsCard = () => {
                   label="Zone Name"
                   defaultValue="No value"
                   name="name"
-                  value={inputs.name || defaults.name}
+                  value={defaults.name}
                   onChange={handleChange}
                 />
                 <TextField
@@ -801,7 +1046,8 @@ const DeviceSettingsCard = () => {
                   value={inputs.location || defaults.location}
                   onChange={handleChange}
                 />
-                <Grid container justifyContent="" alignItems="">
+                {/* //update button below general commented */}
+                {/* <Grid container justifyContent="" alignItems="">
                   <Button
                     sx={{ m: { xs: 1, md: 1 } }}
                     variant="contained"
@@ -811,11 +1057,11 @@ const DeviceSettingsCard = () => {
                   >
                     Update
                   </Button>
-                </Grid>
+                </Grid> */}
               </AccordionDetails>
             </Accordion>
 
-            <Accordion expanded={true}>
+            <Accordion defaultExpanded={true}>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1a-content"
@@ -836,11 +1082,16 @@ const DeviceSettingsCard = () => {
                   inputRef={network_modeRef}
                   // select
                   label="Network Selection"
-                  defaultValue="0"
+                  defaultValue={0}
+                  name="network_mode"
+                  type="number"
                   value={defaults.network_mode}
-                  helperText="0 : Disable | 1 : Wifi | 2 : Ethernet | 3 : 4G "
+                  helperText= {"0 : Disable | 1 : Wifi | 2 : Ethernet | 3 : 4G "}
+                  inputProps={{ min: 0, max: 3 , step: 1}}
+                  // InputProps={{inputprops:{min: 0, max: 3, step: 1}}}
                   // helperText={`Current Value : ${find_label(device.network_mode, network_mode)}`}
-                  // onChange={handleTextInputChange}
+                  error = {formErrors.network_mode ? true : false}
+                  onChange={handleNetworkChange}
                 >
                   {/* {network_mode.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -893,30 +1144,35 @@ const DeviceSettingsCard = () => {
                   </Typography>
 
                   {/* <TextField
-                                        id="outlined-select-currency"
-                                        select
-                                        label="Enable"
-                                        value="true"
-                                        onChange={handleChange}
-                                    >
-                                        {enable.map((option) => (
-                                            <MenuItem key={option.value} value={option.value}>
-                                                {option.label}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField> */}
+                        id="outlined-select-currency"
+                        select
+                        label="Enable"
+                        value="true"
+                        onChange={handleChange}
+                      >
+                      {enable.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                              {option.label}
+                          </MenuItem>
+                        ))}
+                      </TextField> */}
                   <TextField
                     id="outlined-select-currency"
                     inputRef={dhcpRef}
                     // select
                     label="DHCP"
-                    defaultValue="0"
+                    type="number"
+                    defaultValue={0}
                     // helperText={`Current Value : ${find_label(
                     //   device.dhcp,
                     //   dhcp_mode
                     // )}`}
                     helperText="0 : Static | 1 : Dynamic"
+                    inputProps={{ min: 0, max: 1 , step: 1}}
                     value={defaults.dhcp}
+                    name='dhcp'
+                    error = {formErrors.dhcp ? true : false}
+                    onChange={handleNetworkChange}
                   >
                     {/* {dhcp_mode.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -942,6 +1198,9 @@ const DeviceSettingsCard = () => {
                     defaultValue="192.168.29.100"
                     name="ip"
                     value={defaults.ip}
+                    helperText = {formErrors.ip ? "Enter Valid IP Address" : ""}
+                    error = {formErrors.ip ? true : false}
+                    onChange={handleNetworkChange}
                   />
                   <TextField
                     // disabled
@@ -950,7 +1209,10 @@ const DeviceSettingsCard = () => {
                     label="Gateway"
                     defaultValue="192.168.29.1"
                     name="gateway"
+                    helperText = {formErrors.gateway ? "Enter Valid Gateway" : ""}
                     value={defaults.gateway}
+                    onChange={handleNetworkChange}
+                    error = {formErrors.gateway ? true : false}
                   />
                   <TextField
                     // disabled
@@ -959,7 +1221,10 @@ const DeviceSettingsCard = () => {
                     label="Subnet"
                     defaultValue="255.255.255.0"
                     name="subnet"
+                    helperText = {formErrors.subnet ? "Enter Valid Subnet" : ""}
                     value={defaults.subnet}
+                    error = {formErrors.subnet ? true : false}
+                    onChange={handleNetworkChange}
                   />
                   <TextField
                     // disabled
@@ -969,6 +1234,9 @@ const DeviceSettingsCard = () => {
                     defaultValue="8.8.8.8"
                     name="dns1"
                     value={defaults.dns1}
+                    helperText = {formErrors.dns1 ? "Enter Valid DNS" : ""}
+                    error = {formErrors.dns1 ? true : false}
+                    onChange={handleNetworkChange}
                   />
                   <TextField
                     // disabled
@@ -978,6 +1246,9 @@ const DeviceSettingsCard = () => {
                     defaultValue="8.8.2.2"
                     name="dns2"
                     value={defaults.dns2}
+                    error = {formErrors.dns2 ? true : false}
+                    helperText = {formErrors.dns2 ? "Enter Valid DNS" : ""}
+                    onChange={handleNetworkChange}
                   />
                 </div>
 
@@ -1030,13 +1301,14 @@ const DeviceSettingsCard = () => {
                     inputRef={mode_routesRef}
                     // select
                     label="Mode"
-                    defaultValue="0"
+                    defaultValue={0}
                     value={defaults.mode_routes}
                     helperText="0 : MQTT | 1 : HTTP | 2 : MQTTS | 3 : HTTPS"
-                    // helperText={`Current Value : ${find_label(
-                    //   device.mode_routes,
-                    //   data_routes_mode
-                    // )}`}
+                    name="mode_routes"
+                    type='number'
+                    inputProps={{ min: 0, max: 3 , step: 1}}
+                    error = {formErrors.mode_routes ? true : false}
+                    onChange={handleDataRouteChange}
                   >
                     {/* {data_routes_mode.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -1044,77 +1316,6 @@ const DeviceSettingsCard = () => {
                       </MenuItem>
                     ))} */}
                   </TextField>
-                  <Typography sx={{ p: 1 }} variant="h5" gutterBottom>
-                    Upload Certificate : optional
-                  </Typography>
-                  <Button
-                    sx={{ m: { xs: 1, md: 1 } }}
-                    variant="contained"
-                    component="label"
-                    startIcon={<AddTwoToneIcon fontSize="small" />}
-                  >
-                    Upload MQTTS Certificate (.pem)
-                    <input
-                      type="file"
-                      accept=".pem, .cer"
-                      onChange={handleFileSelectMQTTS}
-                      hidden
-                    />
-                  </Button>
-                  <Button
-                    sx={{ m: { xs: 2, md: 2 } }}
-                    variant="contained"
-                    component="label"
-                    startIcon={<UploadIcon fontSize="small" />}
-                    onClick={handleSubmitMQTTCert}
-                  >
-                    Upload
-                  </Button>
-                  <Grid sx={{ m: { xs: 2, md: 2 } }}>
-                    {selectedFileMQTTS ? (
-                      <div>
-                        <p>Filename: {selectedFileMQTTS.name}</p>
-                        <p>Filetype: {selectedFileMQTTS.type}</p>
-                        <p>Size in bytes: {selectedFileMQTTS.size}</p>
-                      </div>
-                    ) : (
-                      <p>Select a file to show details</p>
-                    )}
-                  </Grid>
-                  <Button
-                    sx={{ m: { xs: 1, md: 1 } }}
-                    variant="contained"
-                    component="label"
-                    startIcon={<AddTwoToneIcon fontSize="small" />}
-                  >
-                    Upload HTTPS Certificate (.pem)
-                    <input
-                      type="file"
-                      accept=".pem"
-                      onChange={handleFileSelectHTTPS}
-                      hidden
-                    />
-                  </Button>
-                  <Button
-                    sx={{ m: { xs: 2, md: 2 } }}
-                    variant="contained"
-                    component="label"
-                    startIcon={<UploadIcon fontSize="small" />}
-                    onClick={handleSubmitHTTPSCert}
-                  >
-                    Upload
-                  </Button>
-                  <Grid sx={{ m: { xs: 2, md: 2 } }}>
-                    {selectedFileHTTPS ? (
-                      <div>
-                        <p>Filename: {selectedFileHTTPS.name}</p>
-                        <p>Filetype: {selectedFileHTTPS.type}</p>
-                        <p>Size in bytes: {selectedFileHTTPS.size}</p>
-                      </div>
-                    ) : (
-                      <p>Select a file to show details</p>
-                    )}
-                  </Grid>
                   <Typography sx={{ p: 1 }} variant="h5" gutterBottom>
                     MQTT Configuration
                   </Typography>
@@ -1194,6 +1395,79 @@ const DeviceSettingsCard = () => {
                     Update
                   </Button>
                 </Grid>
+                <Typography sx={{ p: 1 }} variant="h5" gutterBottom>
+                    Upload Certificate (Optional)
+                  </Typography>
+                  <Button
+                    sx={{ m: { xs: 1, md: 1 } }}
+                    variant="contained"
+                    component="label"
+                    color={(certMQTTSerr == true) ? 'error' : 'primary'}
+                    startIcon={<AddTwoToneIcon fontSize="small" />}
+                  >
+                    Upload MQTTS Certificate (.pem)
+                    <input
+                      type="file"
+                      accept=".pem, .cer"
+                      onChange={handleFileSelectMQTTS}
+                      hidden
+                    />
+                  </Button>
+                  <Button
+                    sx={{ m: { xs: 2, md: 2 } }}
+                    variant="contained"
+                    component="label"
+                    startIcon={<UploadIcon fontSize="small" />}
+                    onClick={handleSubmitMQTTCert}
+                  >
+                    Upload
+                  </Button>
+                  <Grid sx={{ m: { xs: 2, md: 2 } }}>
+                    {selectedFileMQTTS ? (
+                      <div>
+                        <p>Filename: {selectedFileMQTTS.name}</p>
+                        <p>Filetype: {selectedFileMQTTS.type}</p>
+                        <p>Size in bytes: {selectedFileMQTTS.size}</p>
+                      </div>
+                    ) : (
+                      <p>Select a file to show details</p>
+                    )}
+                  </Grid>
+                  <Button
+                    sx={{ m: { xs: 1, md: 1 } }}
+                    variant="contained"
+                    component="label"
+                    color={(certHTTPSerr == true) ? 'error' : 'primary'}
+                    startIcon={<AddTwoToneIcon fontSize="small" />}
+                  >
+                    Upload HTTPS Certificate (.pem)
+                    <input
+                      type="file"
+                      accept=".pem"
+                      onChange={handleFileSelectHTTPS}
+                      hidden
+                    />
+                  </Button>
+                  <Button
+                    sx={{ m: { xs: 2, md: 2 } }}
+                    variant="contained"
+                    component="label"
+                    startIcon={<UploadIcon fontSize="small" />}
+                    onClick={handleSubmitHTTPSCert}
+                  >
+                    Upload
+                  </Button>
+                  <Grid sx={{ m: { xs: 2, md: 2 } }}>
+                    {selectedFileHTTPS ? (
+                      <div>
+                        <p>Filename: {selectedFileHTTPS.name}</p>
+                        <p>Filetype: {selectedFileHTTPS.type}</p>
+                        <p>Size in bytes: {selectedFileHTTPS.size}</p>
+                      </div>
+                    ) : (
+                      <p>Select a file to show details</p>
+                    )}
+                  </Grid>
               </AccordionDetails>
             </Accordion>
 
@@ -1210,17 +1484,20 @@ const DeviceSettingsCard = () => {
               <AccordionDetails>
                 <div>
                   <Typography sx={{ p: 1 }} variant="h5" gutterBottom>
-                    Input Read Interval
+                  Publish Interval
                   </Typography>
                   <TextField
                     // disabled
                     id="outlined-required"
                     label="Publish Interval"
-                    defaultValue="0"
+                    defaultValue={1}
+                    type="number"
                     name="in_interval"
+                    inputProps={{ min: 1}}
                     value={defaults.in_interval}
                     inputRef={in_intervalRef}
-                    helperText="seconds"
+                    helperText="seconds | Min : 1"
+                    error = {formErrors.in_interval ? true : false}
                   />
                 </div>
                 <div>
@@ -1232,13 +1509,13 @@ const DeviceSettingsCard = () => {
                     inputRef={in1_modeRef}
                     // select
                     label="Mode"
-                    defaultValue="0"
+                    defaultValue={0}
+                    type="number"
+                    name="in1_mode"
                     value={defaults.in1_mode}
-                    // helperText={`Current Value : ${find_label(
-                    //   device.in1_mode,
-                    //   input1_mode
-                    // )}`}
+                    inputProps={{ min: 0, max: 3 , step: 1}}
                     helperText="0 : Disable | 1 : Counter | 2 : 4-20mA | 3 : NTC"
+                    error = {formErrors.in1_mode ? true : false}
                   >
                     {/* {input1_mode.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -1297,13 +1574,12 @@ const DeviceSettingsCard = () => {
                     inputRef={in2_modeRef}
                     // select
                     label="Mode"
-                    defaultValue="0"
+                    defaultValue={0}
+                    name="in2_mode"
+                    inputProps={{ min: 0, max: 3 , step: 1}}
                     value={defaults.in2_mode}
                     helperText="0 : Disable | 1 : Counter | 2 : 4-20mA | 3 : NTC"
-                    // helperText={`Current Value : ${find_label(
-                    //   device.in2_mode,
-                    //   input2_mode
-                    // )}`}
+                    error = {formErrors.in2_mode ? true : false}
                   >
                     {/* {input2_mode.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -1366,13 +1642,14 @@ const DeviceSettingsCard = () => {
                     inputRef={mb_modeRef}
                     // select
                     label="Mode"
-                    defaultValue="1"
+                    type="number"
+                    defaultValue={1}
                     value={defaults.mb_mode}
-                    // helperText={`Current Value : ${find_label(
-                    //   device.mb_mode,
-                    //   modbus_mode
-                    // )}`}
+                    name="mb_mode"
                     helperText="0 : Disable | 1 : RTU | 2 : ASCII | 3 : TCPIP"
+                    inputProps={{ min: 0, max: 3 , step: 1}}
+                    error = {formErrors.mb_mode ? true : false}
+                    onChange={handleModbusChange}
                   >
                     {/* {modbus_mode.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -1395,8 +1672,25 @@ const DeviceSettingsCard = () => {
                     value={defaults.mb_timeout}
                     id="outlined-required"
                     label="Scan Timeout"
-                    defaultValue="50"
-                    helperText="milliseconds"
+                    type="number"
+                    defaultValue={1000}
+                    inputProps={{ min: 1000}}
+                    helperText="milliseconds | Min : 1000"
+                    error = {formErrors.mb_timeout ? true : false}
+                    onChange={handleModbusChange}
+                  />
+                  <TextField
+                    inputRef={mb_offsetRef}
+                    name="mb_offset"
+                    value={defaults.mb_offset}
+                    id="outlined-required"
+                    label="Offset"
+                    type="number"
+                    defaultValue={1}
+                    inputProps={{ min: 0, step: 1}}
+                    // helperText="milliseconds | Min : 1000"
+                    // error = {formErrors.mb_offset ? true : false}
+                    // onChange={handleModbusChange}
                   />
                   <Typography sx={{ p: 1 }} variant="h5" gutterBottom>
                     MODBUS RTU / ASCII
@@ -1419,13 +1713,13 @@ const DeviceSettingsCard = () => {
                     inputRef={baudRef}
                     // select
                     label="Baud Rate"
-                    defaultValue="9600"
+                    defaultValue={9600}
                     value={defaults.baud}
-                    // helperText={`Current Value : ${find_label(
-                    //   device.baud,
-                    //   modbus_baudrate
-                    // )}`}
+                    name='baud'
+                    type='number'
                     helperText="4800 / 9600 / 115200"
+                    error = {formErrors.baud ? true : false}
+                    onChange={handleModbusChange}
                   >
                     {/* {modbus_baudrate.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
@@ -1447,23 +1741,28 @@ const DeviceSettingsCard = () => {
                     inputRef={data_bitsRef}
                     id="outlined-required"
                     label="Data Bits"
-                    defaultValue="Data Bits"
+                    defaultValue={8}
                     name="data_bits"
                     value={defaults.data_bits}
-                    helperText="8"
+                    helperText="7,8"
+                    type='number'
+                    error = {formErrors.data_bits ? true : false}
+                    onChange={handleModbusChange}
+                    // inputProps={{readOnly: true}}
                   />
                   <TextField
                     id="outlined-select-currency"
                     inputRef={parityRef}
                     // select
                     label="Parity"
-                    defaultValue="DISABLE"
+                    name="parity"
+                    type="number"
+                    defaultValue={0}
                     value={defaults.parity}
-                    // helperText={`Current Value : ${find_label(
-                    //   device.parity,
-                    //   modbus_parity
-                    // )}`}
-                    helperText="0 : DISABLE | 1 :  EVEN | 3 : ODD"
+                    helperText="0 : DISABLE | 1 :  EVEN | 2 : ODD"
+                    inputProps={{ min: 0, max: 2 , step: 1}}
+                    error = {formErrors.parity ? true : false}
+                    onChange={handleModbusChange}
                   >
                     {/* {modbus_parity.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
@@ -1485,13 +1784,12 @@ const DeviceSettingsCard = () => {
                     inputRef={stop_bitsRef}
                     // select
                     label="Stop Bits"
-                    defaultValue="1"
+                    defaultValue={"1"}
+                    name='stop_bits'
                     value={defaults.stop_bits}
-                    // helperText={`Current Value : ${find_label(
-                    //   device.stop_bits,
-                    //   modbus_stop_bits
-                    // )}`}
                     helperText="1, 1_5, 2"
+                    error = {formErrors.stop_bits ? true : false}
+                    onChange={handleModbusChange}
                   >
                     {/* {modbus_stop_bits.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
@@ -1519,7 +1817,7 @@ const DeviceSettingsCard = () => {
                   id="outlined-required"
                   label="IP Address"
                   defaultValue="[192.168.29.100, 192.168.29.101]"
-                  helperText="Use array format"
+                  helperText="[ <address_1>, <address_2>, ... ]"
                 />
                 <TextField
                   inputRef={mb_portRef}
@@ -1535,8 +1833,8 @@ const DeviceSettingsCard = () => {
                   value={defaults.mb_tcp_slaveid}
                   id="outlined-required"
                   label="Slave ID"
-                  defaultValue="[0, 1]"
-                  helperText="Use array format"
+                  defaultValue={"[0, 1]"}
+                  helperText="[ <slave_id_1>, <slave_id_2>, ... ]"
                 />
 
                 <Grid container justifyContent="" alignItems="">
@@ -1594,14 +1892,8 @@ const DeviceSettingsCard = () => {
                     id="outlined-required"
                     label="Modbus Query"
                     defaultValue="[[1,3,100,50,3,0]]"
-                    helperText="[ [ <slaveid>, <function_code>, <address>, <no_of_registers>, <data_type>, <index> ] ]"
-                    onKeyPress={(e) => {
-                      // console.log(e.code);
-                      if (e.code == 'Enter') {
-                        // console.log(e.target.value);
-                        previewQuery();
-                      }
-                    }}
+                    helperText="[ [ <slaveid>, <function_code>, <address>, <no_of_registers>, <data_type>, <index> ], ... ]"
+                    error = {formErrors.mb_query ? true : false}
                   />
                   <Grid container justifyContent="" alignItems="left">
                     <Button
@@ -1641,7 +1933,7 @@ const DeviceSettingsCard = () => {
                   <TextField
                     inputRef={mb_address_mapRef}
                     name="mb_address_map"
-                    value={defaults.mb_address_map}
+                    value={JSON.stringify(defaults.mb_address_map)}
                     id="outlined-required"
                     label="Modbus Address Mapping"
                     defaultValue="[{'tag': 'D4', 'value': 'D1'}, {'tag': 'D4', 'value': 'D1'}]"
@@ -1703,13 +1995,14 @@ const DeviceSettingsCard = () => {
                     inputRef={schedule_restart_enableRef}
                     // select
                     label="Mode"
-                    defaultValue="1"
+                    defaultValue={1}
                     value={defaults.schedule_restart_enable}
-                    // helperText={`Current Value : ${find_label(
-                    //   device.schedule_restart_enable,
-                    //   schedule_restart_mode
-                    // )}`}
+                    name="schedule_restart_enable"
+                    type='number'
                     helperText="0 : Disable | 1 : Enable"
+                    inputProps={{ min: 0, max: 1 , step: 1}}
+                    error = {formErrors.schedule_restart_enable ? true : false}
+                    onChange={handleRestartChange}
                   >
                     {/* {schedule_restart_mode.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
@@ -1731,31 +2024,43 @@ const DeviceSettingsCard = () => {
                     // disabled
                     id="outlined-required"
                     label="Hour"
-                    defaultValue="10,29,30"
+                    type='number'
+                    defaultValue={13}
                     name="schedule_restart_hour"
                     value={defaults.schedule_restart_hour}
                     inputRef={schedule_restart_hourRef}
                     helperText="Range: 0 to 23"
+                    inputProps={{ min: 0, max: 23 , step: 1}}
+                    error = {formErrors.schedule_restart_hour ? true : false}
+                    onChange={handleRestartChange}
                   />
                   <TextField
                     // disabled
                     id="outlined-required"
                     label="Minutes"
-                    defaultValue="10,29,30"
+                    defaultValue={30}
                     name="schedule_restart_minute"
                     value={defaults.schedule_restart_minute}
+                    type='number'
                     inputRef={schedule_restart_minuteRef}
                     helperText="Range: 0 to 60"
+                    inputProps={{ min: 0, max: 60 , step: 1}}
+                    error = {formErrors.schedule_restart_minute ? true : false}
+                    onChange={handleRestartChange}
                   />
                   <TextField
                     // disabled
                     id="outlined-required"
-                    label="Minutes"
-                    defaultValue="10,29,30"
+                    label="Seconds"
+                    defaultValue={0}
                     name="schedule_restart_second"
+                    type='number'
                     value={defaults.schedule_restart_second}
                     inputRef={schedule_restart_secondRef}
                     helperText="Range: 0 to 60"
+                    inputProps={{ min: 0, max: 60 , step: 1}}
+                    error = {formErrors.schedule_restart_second ? true : false}
+                    onChange={handleRestartChange}
                   />
                   <Grid container justifyContent="" alignItems="">
                     <Button
@@ -1774,15 +2079,15 @@ const DeviceSettingsCard = () => {
                 </Typography>
 
                 <Grid container justifyContent="" alignItems="left">
-                  <Button
+                  {/* <Button
                     sx={{ m: { xs: 1, md: 1 } }}
                     variant="contained"
                     component="label"
                     startIcon={<UploadIcon fontSize="small" />}
-                    onClick={handleSubmitFormat}
+                    // onClick={handleSubmitFormat}
                   >
                     Format Memory
-                  </Button>
+                  </Button> */}
                   <Button
                     sx={{ m: { xs: 1, md: 1 } }}
                     variant="contained"

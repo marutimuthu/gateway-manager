@@ -201,27 +201,32 @@ const RecentOrdersTable = ({ cryptoOrders }) => {
     openSnackbar("Please wait", "info");
     event.preventDefault()
     if (selectedFile) {
-      console.log(selectedFile)
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-      formData.append("user_id", userInfo.id);
-
-      // console.log(formData)
-      try {
-        return axios({
-          method: "post",
-          url: `${server_url}/api/file`,
-          data: formData,
-          headers: { "Content-Type": "multipart/form-data" },
-        }).then(res => {
-          // alert(`${res.data.message}`)
-          openSnackbar(res.data.message, "success");
-          window.location.reload(false)
-          // console.log(res.data)
-        })
-      } catch (error) {
-        openSnackbar("Something went wrong..", "error");
-        console.log(error)
+      if(/\s/.test(selectedFile.name)){
+        openSnackbar("Filename must not have blank spaces.", "error");
+      }
+      else{
+        console.log(selectedFile)
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append("user_id", userInfo.id);
+  
+        // console.log(formData)
+        try {
+          return axios({
+            method: "post",
+            url: `${server_url}/api/file`,
+            data: formData,
+            headers: { "Content-Type": "multipart/form-data" },
+          }).then(res => {
+            // alert(`${res.data.message}`)
+            openSnackbar(res.data.message, "success");
+            window.location.reload(false)
+            // console.log(res.data)
+          })
+        } catch (error) {
+          openSnackbar("Something went wrong..", "error");
+          console.log(error)
+        }
       }
     } else {
       openSnackbar("Select file before uploading.", "warning");
