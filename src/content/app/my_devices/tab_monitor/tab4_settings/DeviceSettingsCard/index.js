@@ -348,10 +348,6 @@ const DeviceSettingsCard = () => {
   const [defaults, setDefaults] = useState({});
   const [inputs, setInputs] = useState({});
 
-  const [networkValues, setNetworkValues] = useState({});
-  const [dataRouteValues, setDataRouteValues] = useState({});
-  const [modbusValues, setModbusValues] = useState({});
-  const [restartValues, setRestartValues] = useState({});
   const [formErrors, setFormErrors] = useState({});
 
   const [certHTTPSerr, setCertHTTPSerr] = useState(false);
@@ -484,7 +480,7 @@ const DeviceSettingsCard = () => {
     if((valuez.baud != undefined) && (valuez.baud != 9600 && valuez.baud != 4800 && valuez.baud != 115200)){
       errors.baud = "Set Valid Baud Rate";
     }
-    if(valuez.parity < 0 || valuez.parity > 1){
+    if(valuez.parity < 0 || valuez.parity > 2){
       errors.parity = "Select Valid Parity";
     }
     if((valuez.stop_bits != undefined) && (valuez.stop_bits != '1' && valuez.stop_bits != '1_5' && valuez.stop_bits != '2')){
@@ -520,8 +516,19 @@ const DeviceSettingsCard = () => {
 
   const handleSubmitNetwork = (event) => {
     event.preventDefault();
-    let errors_obj = validateValues(networkValues);
-    console.log(errors_obj);
+
+    var temp_object = {
+      "network_mode" : network_modeRef.current.value,
+      "dhcp" : dhcpRef.current.value,
+      "ip" : ipRef.current.value,
+      "gateway" : gatewayRef.current.value,
+      "subnet" : subnetRef.current.value, 
+      "dns1" : dns1Ref.current.value,
+      "dns2" : dns2Ref.current.value
+    }
+
+    let errors_obj = validateValues(temp_object);
+    // console.log(errors_obj);
     var object_length = Object.keys(errors_obj).length;
     if(object_length > 0){
       setFormErrors(errors_obj);
@@ -544,14 +551,18 @@ const DeviceSettingsCard = () => {
         lte_apn: `${lte_apnRef.current.value}`
       };
 
-      console.log(publish);
+      // console.log(publish);
       publishAxios(publish); 
     }
   };
 
   const handleSubmitRoutes = (event) => {
-    let errors_obj = validateValues(dataRouteValues);
-    console.log(errors_obj);
+    var temp_object = {
+      "mode_routes" : mode_routesRef.current.value
+    }
+
+    let errors_obj = validateValues(temp_object);
+    // console.log(errors_obj);
     var object_length = Object.keys(errors_obj).length;
     if(object_length > 0){
       setFormErrors(errors_obj);
@@ -567,15 +578,10 @@ const DeviceSettingsCard = () => {
         mqtt_url: `${mqtt_urlRef.current.value}`,
         mqtt_user: `${mqtt_userRef.current.value}`,
         mqtt_pass: `${mqtt_passRef.current.value}`,
-  
-        // mqtt_lte_clientid: `${mqtt_lte_clientidRef.current.value}`,
-        // mqtt_lte_url: `${mqtt_lte_urlRef.current.value}`,
-        // mqtt_lte_user: `${mqtt_lte_userRef.current.value}`,
-        // mqtt_lte_pass: `${mqtt_lte_passRef.current.value}`,
         https_api: `${https_apiRef.current.value}`,
         https_backup_api: `${https_backup_apiRef.current.value}`
       };
-      console.log(publish);
+      // console.log(publish);
       publishAxios(publish);
     }
   };
@@ -642,7 +648,7 @@ const DeviceSettingsCard = () => {
         mac_id: mac_id[3],
         action: 'input',
         input_select: `IN1`,
-        mode: `${parseInt(in1_modeRef.current.value).toString}`,
+        mode: `${parseInt(in1_modeRef.current.value).toString()}`,
         slope: `${in1_slopeRef.current.value}`,
         offset: `${in1_offsetRef.current.value}`,
         post_interval: `${parseInt(in_intervalRef.current.value).toString()}`
@@ -659,7 +665,7 @@ const DeviceSettingsCard = () => {
       "in2_mode" : in2_modeRef.current.value
     }
     let errors_obj = validateValues(temp_object);
-    console.log(errors_obj);
+    // console.log(errors_obj);
     var object_length = Object.keys(errors_obj).length;
     if(object_length > 0){
       setFormErrors(errors_obj);
@@ -676,14 +682,24 @@ const DeviceSettingsCard = () => {
         offset: `${in2_offsetRef.current.value}`,
         post_interval: `${parseInt(in_intervalRef.current.value).toString()}`
       };
-      console.log(publish);
+      // console.log(publish);
       publishAxios(publish);
     }
   };
 
   const handleSubmitModbusConfig = (event) => {
     event.preventDefault();
-    let errors_obj = validateValues(modbusValues);
+
+    var temp_object = {
+      "mb_mode" : mb_modeRef.current.value,
+      "mb_timeout" : mb_timeoutRef.current.value,
+      "data_bits" : data_bitsRef.current.value,
+      "baud" : baudRef.current.value,
+      "parity" : parityRef.current.value, 
+      "stop_bits" : stop_bitsRef.current.value
+    }
+
+    let errors_obj = validateValues(temp_object);
     var object_length = Object.keys(errors_obj).length;
     if(object_length > 0){
       setFormErrors(errors_obj);
@@ -720,7 +736,7 @@ const DeviceSettingsCard = () => {
         action: 'modbus',
         query: `${mb_queryRef.current.value}`
       };
-      console.log(publish);
+      // console.log(publish);
       publishAxios(publish);
     }
     else
@@ -740,7 +756,7 @@ const DeviceSettingsCard = () => {
       cmd: 'mb_address_map',
       data: JSON.parse(`${mb_address_mapRef.current.value}`)
     };
-    console.log(publish);
+    // console.log(publish);
     publishAxios(publish);
   };
 
@@ -776,8 +792,16 @@ const DeviceSettingsCard = () => {
 
   const handleSubmitSystem = (event) => {
     event.preventDefault();
-    let errors_obj = validateValues(restartValues);
-    console.log(errors_obj);
+
+    var temp_object = {
+      "schedule_restart_enable" : schedule_restart_enableRef.current.value,
+      "schedule_restart_hour" : schedule_restart_hourRef.current.value,
+      "schedule_restart_minute" : schedule_restart_minuteRef.current.value,
+      "schedule_restart_second" : schedule_restart_secondRef.current.value
+    }
+
+    let errors_obj = validateValues(temp_object);
+    // console.log(errors_obj);
     var object_length = Object.keys(errors_obj).length;
     if(object_length > 0){
       setFormErrors(errors_obj);
@@ -828,11 +852,10 @@ const DeviceSettingsCard = () => {
       .get(`${server_url}/api/device/find/${mac_id[3]}`)
       .then((response) => {
         // console.log('DEBUG zone response', response.data[0]);
-        // console.log(response.data[0]);
+        console.log(response.data[0]);
         setDevice(response.data[0]);
         setDefaults(response.data[0]);
         setData_received(true);
-        // setNetworkValues(response.data[0]);
         setTimeout(() => {
           setDefaults({});
           setLoading(false);
@@ -888,41 +911,8 @@ const DeviceSettingsCard = () => {
     console.log(event.target.files[0]);
   };
 
-  const handleNetworkChange = (e) => {
-    e.preventDefault();
-    setNetworkValues({ ...networkValues, [e.target.name] : (e.target.value)});
-  }
-
-  const handleRestartChange = (e) => {
-    e.preventDefault();
-    setRestartValues({ ...restartValues, [e.target.name] : (e.target.value)});
-  }
-
-  const handleDataRouteChange = (e) => {
-    e.preventDefault();
-    setDataRouteValues({ ...dataRouteValues, [e.target.name] : (e.target.value)});
-  }
-
-  const handleModbusChange = (e) => {
-    e.preventDefault();
-    setModbusValues({ ...modbusValues, [e.target.name] : (e.target.value)});
-  }
-
   useEffect(() => {
-    console.log(networkValues);
-  }, [networkValues]);
-
-  useEffect(() => {
-    console.log(dataRouteValues);
-  }, [dataRouteValues]);
-
-  useEffect(() => {
-    console.log(modbusValues);
-  }, [modbusValues]);
-
-  useEffect(() => {
-    console.log(restartValues);
-  }, [restartValues]);
+  }, [defaults]);
 
   useEffect(() => {
     console.log(formErrors);
@@ -1091,7 +1081,6 @@ const DeviceSettingsCard = () => {
                   // InputProps={{inputprops:{min: 0, max: 3, step: 1}}}
                   // helperText={`Current Value : ${find_label(device.network_mode, network_mode)}`}
                   error = {formErrors.network_mode ? true : false}
-                  onChange={handleNetworkChange}
                 >
                   {/* {network_mode.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -1172,7 +1161,6 @@ const DeviceSettingsCard = () => {
                     value={defaults.dhcp}
                     name='dhcp'
                     error = {formErrors.dhcp ? true : false}
-                    onChange={handleNetworkChange}
                   >
                     {/* {dhcp_mode.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -1197,10 +1185,9 @@ const DeviceSettingsCard = () => {
                     label="IP Address"
                     defaultValue="192.168.29.100"
                     name="ip"
-                    value={defaults.ip}
+                    value={defaults.static_ip}
                     helperText = {formErrors.ip ? "Enter Valid IP Address" : ""}
                     error = {formErrors.ip ? true : false}
-                    onChange={handleNetworkChange}
                   />
                   <TextField
                     // disabled
@@ -1210,8 +1197,7 @@ const DeviceSettingsCard = () => {
                     defaultValue="192.168.29.1"
                     name="gateway"
                     helperText = {formErrors.gateway ? "Enter Valid Gateway" : ""}
-                    value={defaults.gateway}
-                    onChange={handleNetworkChange}
+                    value={defaults.static_gateway}
                     error = {formErrors.gateway ? true : false}
                   />
                   <TextField
@@ -1222,9 +1208,8 @@ const DeviceSettingsCard = () => {
                     defaultValue="255.255.255.0"
                     name="subnet"
                     helperText = {formErrors.subnet ? "Enter Valid Subnet" : ""}
-                    value={defaults.subnet}
+                    value={defaults.static_subnet}
                     error = {formErrors.subnet ? true : false}
-                    onChange={handleNetworkChange}
                   />
                   <TextField
                     // disabled
@@ -1233,10 +1218,9 @@ const DeviceSettingsCard = () => {
                     label="DNS 1"
                     defaultValue="8.8.8.8"
                     name="dns1"
-                    value={defaults.dns1}
+                    value={defaults.static_dns1}
                     helperText = {formErrors.dns1 ? "Enter Valid DNS" : ""}
                     error = {formErrors.dns1 ? true : false}
-                    onChange={handleNetworkChange}
                   />
                   <TextField
                     // disabled
@@ -1245,10 +1229,9 @@ const DeviceSettingsCard = () => {
                     label="DNS 2"
                     defaultValue="8.8.2.2"
                     name="dns2"
-                    value={defaults.dns2}
+                    value={defaults.static_dns2}
                     error = {formErrors.dns2 ? true : false}
                     helperText = {formErrors.dns2 ? "Enter Valid DNS" : ""}
-                    onChange={handleNetworkChange}
                   />
                 </div>
 
@@ -1308,7 +1291,6 @@ const DeviceSettingsCard = () => {
                     type='number'
                     inputProps={{ min: 0, max: 3 , step: 1}}
                     error = {formErrors.mode_routes ? true : false}
-                    onChange={handleDataRouteChange}
                   >
                     {/* {data_routes_mode.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -1342,7 +1324,7 @@ const DeviceSettingsCard = () => {
                     // disabled
                     type="password"
                     id="outlined-required"
-                    label="Username"
+                    label="Broker Username"
                     defaultValue="MQTT User"
                     name="mqtt_user"
                     value={defaults.mqtt_user}
@@ -1352,7 +1334,7 @@ const DeviceSettingsCard = () => {
                     // disabled
                     type="password"
                     id="outlined-required"
-                    label="Password"
+                    label="Broker Password"
                     defaultValue="MQTT Password"
                     name="mqtt_pass"
                     value={defaults.mqtt_pass}
@@ -1649,7 +1631,6 @@ const DeviceSettingsCard = () => {
                     helperText="0 : Disable | 1 : RTU | 2 : ASCII | 3 : TCPIP"
                     inputProps={{ min: 0, max: 3 , step: 1}}
                     error = {formErrors.mb_mode ? true : false}
-                    onChange={handleModbusChange}
                   >
                     {/* {modbus_mode.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -1677,7 +1658,6 @@ const DeviceSettingsCard = () => {
                     inputProps={{ min: 1000}}
                     helperText="milliseconds | Min : 1000"
                     error = {formErrors.mb_timeout ? true : false}
-                    onChange={handleModbusChange}
                   />
                   <TextField
                     inputRef={mb_offsetRef}
@@ -1690,7 +1670,6 @@ const DeviceSettingsCard = () => {
                     inputProps={{ min: 0, step: 1}}
                     // helperText="milliseconds | Min : 1000"
                     // error = {formErrors.mb_offset ? true : false}
-                    // onChange={handleModbusChange}
                   />
                   <Typography sx={{ p: 1 }} variant="h5" gutterBottom>
                     MODBUS RTU / ASCII
@@ -1719,7 +1698,6 @@ const DeviceSettingsCard = () => {
                     type='number'
                     helperText="4800 / 9600 / 115200"
                     error = {formErrors.baud ? true : false}
-                    onChange={handleModbusChange}
                   >
                     {/* {modbus_baudrate.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
@@ -1747,7 +1725,6 @@ const DeviceSettingsCard = () => {
                     helperText="7,8"
                     type='number'
                     error = {formErrors.data_bits ? true : false}
-                    onChange={handleModbusChange}
                     // inputProps={{readOnly: true}}
                   />
                   <TextField
@@ -1762,7 +1739,6 @@ const DeviceSettingsCard = () => {
                     helperText="0 : DISABLE | 1 :  EVEN | 2 : ODD"
                     inputProps={{ min: 0, max: 2 , step: 1}}
                     error = {formErrors.parity ? true : false}
-                    onChange={handleModbusChange}
                   >
                     {/* {modbus_parity.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
@@ -1789,7 +1765,6 @@ const DeviceSettingsCard = () => {
                     value={defaults.stop_bits}
                     helperText="1, 1_5, 2"
                     error = {formErrors.stop_bits ? true : false}
-                    onChange={handleModbusChange}
                   >
                     {/* {modbus_stop_bits.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
@@ -2002,7 +1977,6 @@ const DeviceSettingsCard = () => {
                     helperText="0 : Disable | 1 : Enable"
                     inputProps={{ min: 0, max: 1 , step: 1}}
                     error = {formErrors.schedule_restart_enable ? true : false}
-                    onChange={handleRestartChange}
                   >
                     {/* {schedule_restart_mode.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
@@ -2032,7 +2006,6 @@ const DeviceSettingsCard = () => {
                     helperText="Range: 0 to 23"
                     inputProps={{ min: 0, max: 23 , step: 1}}
                     error = {formErrors.schedule_restart_hour ? true : false}
-                    onChange={handleRestartChange}
                   />
                   <TextField
                     // disabled
@@ -2046,7 +2019,6 @@ const DeviceSettingsCard = () => {
                     helperText="Range: 0 to 60"
                     inputProps={{ min: 0, max: 60 , step: 1}}
                     error = {formErrors.schedule_restart_minute ? true : false}
-                    onChange={handleRestartChange}
                   />
                   <TextField
                     // disabled
@@ -2060,7 +2032,6 @@ const DeviceSettingsCard = () => {
                     helperText="Range: 0 to 60"
                     inputProps={{ min: 0, max: 60 , step: 1}}
                     error = {formErrors.schedule_restart_second ? true : false}
-                    onChange={handleRestartChange}
                   />
                   <Grid container justifyContent="" alignItems="">
                     <Button
