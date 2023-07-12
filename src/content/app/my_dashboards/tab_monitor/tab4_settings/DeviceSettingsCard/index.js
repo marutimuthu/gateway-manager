@@ -129,6 +129,7 @@ const DeviceSettingsCard = () => {
     const mb_modeRef = useRef();
     const mb_intervalRef = useRef();
     const mb_timeoutRef = useRef();
+    const mb_offsetRef = useRef();
     const baudRef = useRef();
     const data_bitsRef = useRef();
     const parityRef = useRef();
@@ -209,6 +210,7 @@ const DeviceSettingsCard = () => {
             "mb_mode": `${mb_modeRef.current.value}`,
             "mb_interval": `${mb_intervalRef.current.value}`,
             "mb_timeout": `${mb_timeoutRef.current.value}`,
+            "mb_offset": `${parseInt(mb_offsetRef.current.value)}`,
             "baud": `${baudRef.current.value}`,
             "data_bits": `${data_bitsRef.current.value}`,
             "parity": `${parityRef.current.value}`,

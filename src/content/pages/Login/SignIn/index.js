@@ -72,7 +72,7 @@ export default function SignIn() {
     if (reason === 'clickaway') {
       return;
     }
-    open = false;
+    setOpen(false);
   };
 
   useEffect(() => {
